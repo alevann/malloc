@@ -4,7 +4,7 @@
 #define mheaderptr struct malloc_hdr*
 #define mhs sizeof(struct malloc_hdr)
 
-// A 32 bytes sized header containing data required for book-keeping
+// 32 bytes sized header containing data required for bookkeeping
 // The pointers next & prev are only used in the free function 
 // and should not point to reserved allocated blocks. 
 // The size does NOT include the size of the header, it is the exact size of the buffer.
@@ -15,7 +15,7 @@ struct malloc_hdr {
   unsigned char* buffer;    // start of the buffer
 };
 
-unsigned char main_buffer[MAX_MALLOC_SIZE];   // The preallocated buffer holding the data
+unsigned char main_buffer[MAX_MALLOC_SIZE];   // The pre-allocated buffer holding the data
 mheaderptr hfree;                             // The head of the linked list holding the free blocks
 
 // Initializes the genesis block at the start of the main_buffer
@@ -33,7 +33,7 @@ void init_malloc()
 
 void* __malloc(int size)
 {
-  // No more avilable memory is left
+  // No more available memory is left
   if (hfree == NULL) return NULL;
 
   int hblocksize = size + mhs;    // Size of the header and allocated block
@@ -48,7 +48,7 @@ void* __malloc(int size)
     // There is enough space but the header won't fit
     if (cur->size >= size && cur->size < hblocksize)
     {
-      // The current block will hijacked so
+      // The current block will be hijacked so
       // make sure the head points to a valid block
       if (cur == hfree) hfree = cur->next;
 
@@ -80,8 +80,8 @@ void* __malloc(int size)
       cur->next = NULL;
       cur->prev = NULL;
 
-      // The difference between the beginning of the next header and 
-      // the start of the buffer, is the size the buffer has been shrinked to
+      // The difference between the beginning of the next header and
+      // the start of the buffer, is the size the buffer has been shrunk to
       cur->size = ((unsigned char*) nhdr) - cur->buffer;
 
       // If the current node was the head, the new node is now the head
@@ -126,7 +126,7 @@ void __free(void* buffer)
       tfree->next = cur;
       tfree->prev = cur->prev;
 
-      // Update the other blocks so they point to the jsut freed header
+      // Update the other blocks, so they point to the just freed header
       tfree->prev->next = tfree;
       tfree->next->prev = tfree;
 
@@ -173,7 +173,7 @@ void coalesce_free_blocks()
         break;
       
       // Update the current node to include the 
-      // next blocks's buffer and header
+      // next block's buffer and header
       cur->size += next->size + mhs;
       cur->next = next->next;
 
@@ -190,10 +190,10 @@ void malloc_free_list()
 {
   struct malloc_hdr* cur = hfree;
   do {
-    printf("block: 0x%p\n", cur);
-    printf("\tsize: 0x%d\n", cur->size);
-    printf("\tnext: 0x%p\n", cur->next);
-    printf("\tprev: 0x%p\n", cur->prev);
+    printf("block: 0x%p\n"   , cur        );
+    printf("\tsize: 0x%d\n"  , cur->size  );
+    printf("\tnext: 0x%p\n"  , cur->next  );
+    printf("\tprev: 0x%p\n"  , cur->prev  );
     printf("\tbuffer: 0x%p\n", cur->buffer);
   } while ((cur = cur->next) != 0x0);
 }
